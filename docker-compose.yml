@@ -1,0 +1,25 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: drupal
+      MYSQL_DATABASE: local_drupal
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    ports:
+      - "3307:3306"
+  rabbitmq:
+    image: rabbitmq
+  web:
+    depends_on:
+      - mysql
+    build: apache
+    volumes:
+      - ./www:/var/www/html
+    links:
+      - mysql
+    ports:
+      - "8080:80"
+    working_dir: /var/www/html
