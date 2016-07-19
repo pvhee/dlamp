@@ -14,7 +14,7 @@
 
 #### Footnote
 
-[^1] If you change the content of the dir `www/` you should reload the containers.
+[^1] If you change the link `www/` you should reload the containers.
 
 [2] If you want to use symfony use `000-sf.conf` rather the default one
 
