@@ -1,24 +1,27 @@
-FROM debian:stretch
+FROM php:7.0-apache
 
-MAINTAINER Saphyel <Saphyel@gmail.com>
+RUN apt-get update -qq ; apt-get install -y -qq libxml2-dev unzip git \
+  mysql-client \
+  libpng12-dev libjpeg62-turbo-dev libfreetype6-dev imagemagick libmagick++-dev \
+  ; pecl install imagick \
+  ; docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+  ; docker-php-ext-install pdo_mysql soap opcache gd bcmath \
+  ; docker-php-ext-enable imagick \
+  ; a2enmod rewrite ; service apache2 restart
+COPY php.ini /usr/local/etc/php/
 
-RUN apt update ; apt install -y ca-certificates unzip curl apache2 \
-    libapache2-mod-php imagemagick php7.0-mbstring php7.0-dev php7.0-gd \
-    php7.0-intl php-imagick php7.0-soap php7.0-bcmath php-xdebug php7.0-curl \
-    php7.0-mysql --fix-missing ; rm -rf /var/lib/apt/lists
-RUN a2enmod rewrite ; service apache2 start
-ADD 000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# Install Composer
+# Install composer
 RUN curl -sS https://getcomposer.org/installer | php \
   ; mv composer.phar /usr/bin/composer \
-  ; ln -s /root/.composer/vendor/bin/* /usr/local/bin
 ; composer global require hirak/prestissimo
 
 # Install drupal Console & drush
 RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
   ; mv drupal.phar /usr/local/bin/drupal \
-; chmod +x /usr/local/bin/drupal ; drupal init --override 
+  ; chmod +x /usr/local/bin/drupal ; drupal init --override \
+  ; composer global require phing/phing drush/drush \
+; ln -s ~/.composer/vendor/bin/* /usr/local/bin
 
-RUN chown www-data /var/www
-CMD /usr/sbin/apache2ctl -D FOREGROUND
+# FE Tools
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+  ; apt-get install -y nodejs
