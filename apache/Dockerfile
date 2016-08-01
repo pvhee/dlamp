@@ -24,4 +24,7 @@ RUN curl https://drupalconsole.com/installer -L -o drupal.phar \
 
 # FE Tools
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
-  ; apt-get install -y nodejs
+  ; apt-get install -y nodejs bundler
+
+COPY ssh /root/.ssh
+RUN chmod 700 /root/.ssh ; chmod 600 /root/.ssh/* ; chmod 644 /root/.ssh/*id_rs*pub

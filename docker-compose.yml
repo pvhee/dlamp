@@ -7,12 +7,12 @@ services:
       - 8080:80
     depends_on:
       - mysql
-      - memcached
       - rabbitmq
-#      - solr
+      - solr
+#      - memcached
     volumes:
-      - ./www:/var/www
-    working_dir: /var/www
+      - ./www:/var/www/html
+    working_dir: /var/www/html
   mysql:
     image: mysql:5.7
     environment:
@@ -20,12 +20,6 @@ services:
       MYSQL_DATABASE: drupal
     ports:
       - 3307:3306
-  memcached:
-    image: memcached
-    expose:
-      - 11211
-    ports:
-      - 11211:11211
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -34,14 +28,20 @@ services:
     hostname: drupal-rabbit
     environment:
       RABBITMQ_HIPE_COMPILE: 1
-#  solr:
-#    image: solr:5.4.1
+  solr:
+    image: solr:5.4.1
+    ports:
+      - 8983:8983
+    volumes:
+      - ./www/profiles/cr/modules/contrib/search_api_solr/solr-conf/5.x:/drupal/conf
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - campaign
+      - /drupal
+#  memcached:
+#    image: memcached
+#    expose:
+#      - 11211
 #    ports:
-#      - 8983:8983
-#    volumes:
-#      - ./www/profiles/cr/modules/contrib/search_api_solr/solr-conf/5.x:/drupal/conf
-#    entrypoint:
-#      - docker-entrypoint.sh
-#      - solr-precreate
-#      - rnd17
-#      - /drupal
+#      - 11211:11211
